@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import StripeWrapper from './StripeWrapper';
-import CheckoutForm from './CheckoutForm';
+import StripeWrapper from '@/app/lib/stripe';
+import CheckoutForm from './checkoutForm';
 
 export default function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState('');

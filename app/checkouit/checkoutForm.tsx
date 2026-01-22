@@ -11,7 +11,7 @@ export default function CheckoutForm() {
     const result = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: 'http://localhost:3002/success',
+        return_url: 'https://stripe-googlepay-front-zeta.vercel.app/success',
       },
     });
 

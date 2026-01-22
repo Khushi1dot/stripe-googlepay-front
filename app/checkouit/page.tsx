@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import StripeProvider from '@/app/lib/stripe';
-import CheckoutForm from '@/app/checkouit/checkoutForm';
+import StripeWrapper from './StripeWrapper';
+import CheckoutForm from './CheckoutForm';
 
 export default function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState('');
@@ -20,8 +20,8 @@ export default function CheckoutPage() {
   if (!clientSecret) return <p>Loading...</p>;
 
   return (
-    <StripeProvider clientSecret={clientSecret}>
+    <StripeWrapper clientSecret={clientSecret}>
       <CheckoutForm />
-    </StripeProvider>
+    </StripeWrapper>
   );
 }

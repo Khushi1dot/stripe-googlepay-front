@@ -125,7 +125,6 @@
 //     </>
 //   );
 // }
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -133,16 +132,15 @@ import {
   PaymentElement,
   PaymentRequestButtonElement,
   useStripe,
-  useElements,
 } from '@stripe/react-stripe-js';
-import './checkout.css';
 
-export default function CheckoutForm() {
+export default function CheckoutForm({
+  clientSecret,
+}: {
+  clientSecret: string;
+}) {
   const stripe = useStripe();
-  const elements = useElements();
-
   const [paymentRequest, setPaymentRequest] = useState<any>(null);
-  const [canUseWallet, setCanUseWallet] = useState(false);
 
   useEffect(() => {
     if (!stripe) return;
@@ -150,99 +148,62 @@ export default function CheckoutForm() {
     const pr = stripe.paymentRequest({
       country: 'US',
       currency: 'usd',
-      total: {
-        label: 'Total',
-        amount: 10000,
-      },
+      total: { label: 'Total', amount: 10000 },
       requestPayerName: true,
       requestPayerEmail: true,
     });
 
-    pr.canMakePayment().then((result) => {
-      if (result) {
-        setPaymentRequest(pr);
-        setCanUseWallet(true);
-      }
+    pr.canMakePayment().then(result => {
+      if (result) setPaymentRequest(pr);
     });
 
-    pr.on('paymentmethod', async (ev) => {
-         if (!stripe) {
-    ev.complete('fail');
-    return;
-  }
-    //   const { error, paymentIntent } = await stripe.confirmPayment({
-    //     elements,
-    //     confirmParams: {
-    //       payment_method: ev.paymentMethod.id,
-    //     //   return_url: 'http://localhost:3000/success',
-    //     return_url: 'https://stripe-googlepay-front-zeta.vercel.app/success',
-    //     },
-    //     redirect: 'if_required',
-    //   });
+    pr.on('paymentmethod', async ev => {
+      if (!stripe) return ev.complete('fail');
 
-    const { error, paymentIntent } = await stripe.confirmCardPayment(
-  process.env.NEXT_PUBLIC_STRIPE_CLIENT_SECRET!,
-  {
-    payment_method: ev.paymentMethod.id,
-  }
-);
+      const { error, paymentIntent } =
+        await stripe.confirmCardPayment(clientSecret, {
+          payment_method: ev.paymentMethod.id,
+        });
 
       if (error) {
         ev.complete('fail');
       } else {
         ev.complete('success');
-
         if (paymentIntent?.status === 'succeeded') {
           window.location.href =
-            // 'http://localhost:3000/success?redirect_status=succeeded';
-            'https://stripe-googlepay-front-zeta.vercel.app/success?redirect_status=succeeded';
+            '/success?redirect_status=succeeded';
         }
       }
     });
-  }, [stripe, elements]);
+  }, [stripe, clientSecret]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe) return;
 
-    const result = await stripe.confirmPayment({
-      elements,
+    await stripe.confirmPayment({
+      clientSecret,
       confirmParams: {
-        // return_url: 'http://localhost:3000/success',
-        return_url: 'https://stripe-googlepay-front-zeta.vercel.app/success',
+        return_url:
+          'https://stripe-googlepay-front-zeta.vercel.app/success',
       },
     });
-
-    if (result.error) {
-      console.error(result.error.message);
-    }
   };
 
   return (
     <div className="checkout-container">
-      <h2 className="checkout-title">Complete your payment</h2>
-
-      {/* Wallet button */}
-      {canUseWallet && paymentRequest && (
-        <div className="wallet-section">
+      {paymentRequest && (
+        <>
           <PaymentRequestButtonElement
             options={{ paymentRequest }}
           />
           <div className="divider">OR</div>
-        </div>
+        </>
       )}
 
-      {/* Payment Element */}
-      <form onSubmit={handleSubmit} className="checkout-form">
+      <form onSubmit={handleSubmit}>
         <PaymentElement />
-
-        <button
-          type="submit"
-          className="pay-button"
-          disabled={!stripe}
-        >
-          Pay $100.00
-        </button>
+        <button type="submit">Pay $100</button>
       </form>
     </div>
   );

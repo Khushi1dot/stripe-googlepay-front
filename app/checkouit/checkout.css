@@ -1,0 +1,53 @@
+.checkout-container {
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.checkout-title {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.wallet-section {
+  margin-bottom: 16px;
+}
+
+.divider {
+  margin: 16px 0;
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pay-button {
+  height: 48px;
+  border-radius: 8px;
+  border: none;
+  background-color: #635bff;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pay-button:hover {
+  background-color: #5147ff;
+}
+
+.pay-button:disabled {
+  background-color: #c7c7c7;
+  cursor: not-allowed;
+}

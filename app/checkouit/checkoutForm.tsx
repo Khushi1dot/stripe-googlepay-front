@@ -166,14 +166,26 @@ export default function CheckoutForm() {
     });
 
     pr.on('paymentmethod', async (ev) => {
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          payment_method: ev.paymentMethod.id,
-          return_url: 'http://localhost:3000/success',
-        },
-        redirect: 'if_required',
-      });
+         if (!stripe) {
+    ev.complete('fail');
+    return;
+  }
+    //   const { error, paymentIntent } = await stripe.confirmPayment({
+    //     elements,
+    //     confirmParams: {
+    //       payment_method: ev.paymentMethod.id,
+    //     //   return_url: 'http://localhost:3000/success',
+    //     return_url: 'https://stripe-googlepay-front-zeta.vercel.app/success',
+    //     },
+    //     redirect: 'if_required',
+    //   });
+
+    const { error, paymentIntent } = await stripe.confirmCardPayment(
+  process.env.NEXT_PUBLIC_STRIPE_CLIENT_SECRET!,
+  {
+    payment_method: ev.paymentMethod.id,
+  }
+);
 
       if (error) {
         ev.complete('fail');
@@ -182,7 +194,8 @@ export default function CheckoutForm() {
 
         if (paymentIntent?.status === 'succeeded') {
           window.location.href =
-            'http://localhost:3000/success?redirect_status=succeeded';
+            // 'http://localhost:3000/success?redirect_status=succeeded';
+            'https://stripe-googlepay-front-zeta.vercel.app/success?redirect_status=succeeded';
         }
       }
     });
@@ -195,7 +208,8 @@ export default function CheckoutForm() {
     const result = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: 'http://localhost:3000/success',
+        // return_url: 'http://localhost:3000/success',
+        return_url: 'https://stripe-googlepay-front-zeta.vercel.app/success',
       },
     });
 
